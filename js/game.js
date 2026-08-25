@@ -16,7 +16,7 @@ G.new=function(seedWord, days){
   const s={
     v:1, seedWord:String(seedWord), seed, day:1, days,
     loc:HOME, cash:RULES.startCash, bank:0, debt:RULES.startDebt,
-    health:RULES.startHealth, trunk:RULES.startTrunk, lawyers:0,
+    health:RULES.startHealth, trunk:RULES.startTrunk, lawyers:0, lastFeds:-99,
     inv:GOODS.map(()=>0), paid:GOODS.map(()=>0),   // paid = total cost basis, for avg display
     prices:[], hist:[], event:null, encounter:null, phase:'market', // market | encounter | over
     log:[], stats:{bought:0,sold:0,profit:0,escapes:0,bribes:0,cases:0},
@@ -33,6 +33,7 @@ G.load=function(json){
   let s; try{ s= typeof json==='string'? JSON.parse(json): json; }catch(e){ return null; }
   if(!s || s.v!==1 || !Array.isArray(s.inv) || s.inv.length!==GOODS.length) return null;
   if(!Array.isArray(s.hist)) s.hist=[];
+  if(s.lastFeds==null) s.lastFeds=-99;
   G.state=s; RNG.state=s.rng; return s;
 };
 G.save=function(){ return JSON.stringify(G.state); };
@@ -156,8 +157,12 @@ function fill(tpl,vars){ return tpl.replace(/\{(\w+)\}/g,(m,k)=> k in vars? vars
 G._arrive=function(s){
   // 1. the Task Force? odds grow with the calendar and how much you're hauling
   const hauling=Math.min(1, G.stashValue(s)/(50000));
-  const pFeds=Math.min(RULES.fedsMax, RULES.fedsBase + RULES.fedsPerDay*(s.day/s.days) + RULES.fedsPerValue*hauling);
+  // heat: the Task Force does not re-tail you the day after a chase; odds
+  // ramp back over RULES.heatDays so streaks are the exception, not the rule
+  const cool=Math.min(1,(s.day-(s.lastFeds==null?-99:s.lastFeds))/RULES.heatDays);
+  const pFeds=Math.min(RULES.fedsMax, RULES.fedsBase + RULES.fedsPerDay*(s.day/s.days) + RULES.fedsPerValue*hauling)*cool;
   if(G.used(s)>0 && RNG.chance(pFeds)){
+    s.lastFeds=s.day;
     const agents=1+RNG.int(Math.min(6, 2+Math.floor(4*s.day/s.days)));
     s.encounter={agents, start:agents, rounds:0};
     s.phase='encounter';

@@ -56,7 +56,8 @@ const RULES={
   priceEventRate:0.18,    // chance per travel of a spike or crash
   spikeMult:[2.6,4.2], crashDiv:[2.8,4.5],
   fedsBase:0.05, fedsPerDay:0.35, fedsPerValue:0.20, // encounter odds pieces
-  fedsMax:0.55,
+  fedsMax:0.45,
+  heatDays:3,             // days for encounter odds to ramp back after a chase
   runBase:0.62, runPerAgent:0.09,
   hitLo:9, hitHi:22,        // health lost when a run fails
   bribePerAgent:650,

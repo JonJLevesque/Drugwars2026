@@ -69,8 +69,8 @@ td.price{font-weight:600} tr.spike td.price{color:var(--grn)} tr.crash td.price{
 td.gd{cursor:pointer}
 td .k{display:inline-block;width:16px;color:var(--dim);font-size:12px}
 td.ic{width:22px;padding:2px 4px} td.ic canvas{display:block;image-rendering:pixelated}
-td.tr{width:74px;padding:2px 6px} td.tr canvas{display:block}
-th.trend{width:74px}
+td.tr{width:90px;padding:2px 6px} td.tr canvas{display:block}
+th.trend{width:90px}
 tr.off td.ic{opacity:.3}
 td .arrow{font-size:11px;margin-left:4px}
 .act{display:flex;gap:6px;justify-content:flex-end}
@@ -161,3 +161,6 @@ body.calm .shake{animation:none}
 }
 .icw{display:inline-block;vertical-align:middle;margin-right:8px}
 .icw canvas{display:block;image-rendering:pixelated}
+
+#chartwrap{margin-top:10px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg)}
+#chart{display:block;width:100%;height:auto}

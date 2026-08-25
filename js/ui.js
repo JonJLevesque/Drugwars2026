@@ -55,7 +55,7 @@ function renderMarket(){
       '<td class="ic gd"></td>'+
       '<td class="gd">'+g.name+' <span class="dim">/'+g.unit+'</span></td>'+
       '<td class="num price gd">'+(p?fmt(p)+arrow:'')+'</td>'+
-      '<td class="tr gd"><canvas width="74" height="18"></canvas></td>'+
+      '<td class="tr gd"><canvas width="90" height="22"></canvas></td>'+
       '<td class="num gd">'+(s.inv[i]||'')+'</td>'+
       '<td class="num gd '+(s.inv[i]&&p? (p>=paid?'grn':'red'):'dim')+'">'+(s.inv[i]?fmt(paid):'')+'</td>'+
       '<td><div class="act">'+
@@ -69,6 +69,7 @@ function renderMarket(){
     tr.querySelector('.sell').addEventListener('click',()=>{ UI.sel=i; askQty('sell',i); });
     tb.appendChild(tr);
   });
+  ART.chart(el('chart'),s,UI.sel);
 }
 function renderDay(){
   const s=G.state; const e=s.event; const dc=el('daycard'); const bt=el('dayBtns'); bt.innerHTML='';

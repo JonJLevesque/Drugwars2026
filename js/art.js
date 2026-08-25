@@ -84,7 +84,7 @@ const ART=(()=>{
     return bd<22? best : -1;
   }
 
-  /* ---- sparkline of one good's price over the days visited ---- */
+  /* ---- sparkline of one good's price over the days visited (log scale, band shaded) ---- */
   function spark(cv,vals,lo,hi,cur){
     const w=cv.width,hh=cv.height; const x=cv.getContext('2d'); x.clearRect(0,0,w,hh);
     const pts=vals.map((v,i)=>v?[ (vals.length>1? i/(vals.length-1):1)*(w-4)+2, hh-2-(Math.log(Math.max(1,v))-Math.log(lo/5))/(Math.log(hi*5)-Math.log(lo/5))*(hh-4)]:null);
@@ -123,6 +123,49 @@ const ART=(()=>{
     if(opt.hit){ x.fillStyle='rgba(255,90,90,'+Math.max(0,0.5-opt.hit/600)+')'; x.fillRect(0,0,w,hh); }
   }
 
+
+  /* ---- the big chart: one good's history, readable ---- */
+  function chart(cv,s,i){
+    const g=GOODS[i]; const w=cv.width,hh=cv.height; const x=cv.getContext('2d');
+    x.fillStyle='#0b0d10'; x.fillRect(0,0,w,hh);
+    const L=58,R=14,T=14,B=22; const pw=w-L-R, ph=hh-T-B;
+    const hist=s.hist; const vals=hist.map(h=>h.prices[i]);
+    const seen=vals.filter(v=>v>0); const paid=G.avgPaid(s,i);
+    let lo=Math.min(g.lo,...seen,paid||g.lo)/1.25, hi=Math.max(g.hi,...seen,paid||g.hi)*1.25;
+    const Y=v=>T+ph-(Math.log(v)-Math.log(lo))/(Math.log(hi)-Math.log(lo))*ph;
+    const n=Math.max(2,hist.length); const X=k=>L+(hist.length>1? k/(hist.length-1):1)*pw;
+    x.font='10px ui-monospace,Menlo,monospace'; x.textBaseline='middle';
+    // everyday band
+    x.fillStyle='rgba(159,232,112,.07)'; x.fillRect(L,Y(g.hi),pw,Y(g.lo)-Y(g.hi));
+    x.strokeStyle='rgba(159,232,112,.35)'; x.setLineDash([3,4]); x.lineWidth=1;
+    [[g.lo,'low'],[g.hi,'high']].forEach(([v,lab])=>{ x.beginPath(); x.moveTo(L,Y(v)); x.lineTo(L+pw,Y(v)); x.stroke();
+      x.fillStyle=C.dim; x.textAlign='right'; x.fillText(fmtK(v),L-6,Y(v)); });
+    // your average paid
+    if(paid>0&&s.inv[i]>0){ x.strokeStyle=C.amber; x.setLineDash([2,3]); x.beginPath(); x.moveTo(L,Y(paid)); x.lineTo(L+pw,Y(paid)); x.stroke();
+      x.fillStyle=C.amber; x.textAlign='right'; x.textBaseline='bottom'; x.fillText('paid '+fmtK(paid),L+pw-2,Y(paid)-2); x.textBaseline='middle'; }
+    x.setLineDash([]);
+    // the line
+    x.strokeStyle=C.txt; x.lineWidth=1.5; x.beginPath(); let pen=false;
+    vals.forEach((v,k)=>{ if(!v){ pen=false; return; } if(!pen){ x.moveTo(X(k),Y(v)); pen=true; } else x.lineTo(X(k),Y(v)); });
+    x.stroke();
+    // points + markers
+    vals.forEach((v,k)=>{ const px=X(k);
+      x.fillStyle=C.dim; x.textAlign='center'; x.textBaseline='top';
+      if(hist.length<=16 || k%Math.ceil(hist.length/16)===0 || k===hist.length-1) x.fillText('d'+hist[k].day,px,T+ph+6);
+      x.textBaseline='middle';
+      if(!v){ x.fillStyle='#2a323d'; x.fillRect(px-1,T+ph-3,2,3); return; }
+      const spike=v>g.hi, crash=v<g.lo;
+      x.fillStyle= spike?C.glow: crash?C.red: C.txt; x.beginPath(); x.arc(px,Y(v),spike||crash?3.5:2.5,0,Math.PI*2); x.fill();
+      if(spike||crash){ x.textAlign='center'; x.fillText(spike?'▲ '+fmtK(v):'▼ '+fmtK(v),px,Y(v)+(spike?-12:12)); } });
+    // current price, labelled
+    const cur=s.prices[i]; const lastK=hist.length-1;
+    if(cur){ x.fillStyle=C.amber; x.beginPath(); x.arc(X(lastK),Y(cur),4,0,Math.PI*2); x.fill();
+      x.textAlign='right'; x.textBaseline='bottom'; x.fillText('now '+fmt(cur),L+pw,T-2); }
+    x.textAlign='left'; x.textBaseline='bottom'; x.fillStyle=C.txt; x.font='bold 11px ui-monospace,Menlo,monospace';
+    x.fillText(g.name.toUpperCase()+'  /'+g.unit+'  ·  '+seen.length+' of '+hist.length+' stops',L,T-2);
+    if(seen.length<2){ x.fillStyle=C.dim; x.font='10px ui-monospace,Menlo,monospace'; x.textAlign='center'; x.textBaseline='middle'; x.fillText('history fills in as you travel',L+pw/2,T+ph/2); }
+  }
+
   /* ---- trunk gauge: one colored segment per good, in inventory ---- */
   const GCOL={coke:'#f2f4f7',her:'#b8865a',ket:'#7fb3e0',mol:'#ff6fb0',shr:'#f0e6c8',weed:'#5fc06a',xan:'#c9cfd8',add:'#ff9a3c'};
   function gauge(cv,s){
@@ -133,5 +176,5 @@ const ART=(()=>{
   }
   function bar(cv,frac,col){ const w=cv.width,hh=cv.height; const x=cv.getContext('2d'); x.fillStyle='#0b0d10'; x.fillRect(0,0,w,hh); x.fillStyle=col; x.fillRect(0,0,w*clamp(frac,0,1),hh); x.strokeStyle='#232a33'; x.strokeRect(0.5,0.5,w-1,hh-1); }
 
-  return { icon, map, mapHit, spark, scene, gauge, bar, GCOL, MAP_W:W, MAP_H:H };
+  return { icon, map, mapHit, spark, chart, scene, gauge, bar, GCOL, MAP_W:W, MAP_H:H };
 })();
