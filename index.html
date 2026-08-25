@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drugwars 2026</title>
+<meta name="description" content="Drugwars 2026 — the TI-83 classic, thirty years on. Buy low, sell high, don't get caught.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="stage">
+  <!-- status strip: every number the player steers by, always visible -->
+  <header id="strip" aria-label="Status">
+    <span class="gname">DRUG<i>WARS</i><small>2026</small></span>
+    <span class="st"><small>DAY</small><b id="sDay">—</b></span>
+    <span class="st"><small>CASH</small><b id="sCash" class="grn">—</b></span>
+    <span class="st"><small>BANK</small><b id="sBank">—</b></span>
+    <span class="st"><small>DEBT</small><b id="sDebt" class="red">—</b></span>
+    <span class="st"><small>TRUNK</small><b id="sTrunk">—</b></span>
+    <span class="st"><small>HEALTH</small><b id="sHealth">—</b></span>
+    <span class="st"><small>LAWYERS</small><b id="sLaw">—</b></span>
+    <button id="bSettings" class="ico" type="button" title="Settings" aria-label="Settings">&#9881;</button>
+  </header>
+
+  <main id="game" class="hidden">
+    <section id="left">
+      <div id="locbar">
+        <span id="locName">—</span>
+        <span id="locBlurb"></span>
+      </div>
+      <!-- the day card: what just happened on the drive in -->
+      <div id="daycard" role="status" aria-live="polite">
+        <p id="dayText"></p>
+        <div id="dayBtns"></div>
+      </div>
+      <table id="market" aria-label="Market prices">
+        <thead><tr><th>#</th><th></th><th>GOOD</th><th class="num">PRICE</th><th class="trend">TREND</th><th class="num">HAVE</th><th class="num">PAID</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p id="msg" role="alert"></p>
+    </section>
+
+    <aside id="right">
+      <div id="mapwrap">
+        <canvas id="map" width="300" height="210" aria-label="City map. Click a district to drive there." role="img"></canvas>
+        <div id="mapHint">click a district to drive</div>
+      </div>
+      <button id="bTravel" class="big" type="button" title="Drive to another district — the day turns over (T)">TRAVEL <kbd>T</kbd></button>
+      <div class="gauges">
+        <div class="gl"><small>TRUNK</small><canvas id="gTrunk" width="120" height="8"></canvas></div>
+        <div class="gl"><small>HEALTH</small><canvas id="gHealth" width="120" height="8"></canvas></div>
+      </div>
+      <div id="services" class="hidden">
+        <div class="sv-title">DOWNTOWN</div>
+        <button class="sv" id="bBank" type="button">BANK <small>1%/day</small></button>
+        <button class="sv" id="bLoan" type="button">PAYLATER <small>10%/day</small></button>
+        <button class="sv" id="bClinic" type="button">CLINIC</button>
+      </div>
+      <div id="awayNote" class="hidden">bank · loan · clinic<br>are Downtown</div>
+      <div id="logbox"><div class="sv-title">LEDGER</div><div id="log"></div></div>
+    </aside>
+  </main>
+
+  <!-- title -->
+  <div class="overlay" id="menu">
+    <div class="card">
+      <div class="logo">DRUG<i>WARS</i></div>
+      <p class="sub">2026 · the ti-83 classic, thirty years on</p>
+      <p class="blurb">You owe PayLater <b>$5,500</b> at <b>10% a day</b>. You have <b>$2,000</b>, a trunk, and a city
+        where everything is for sale. Thirty days to flip it into something worth keeping.
+        Buy low. Sell high. Don't get caught.</p>
+      <div class="row">
+        <label for="seed">SEED</label>
+        <input id="seed" type="text" maxlength="24" spellcheck="false" autocomplete="off">
+        <button id="bReroll" class="sm" type="button" title="New random seed">&#8635;</button>
+      </div>
+      <div class="row" id="lenRow" role="radiogroup" aria-label="Run length"></div>
+      <div class="row btns">
+        <button id="bResume" class="big hidden" type="button">RESUME</button>
+        <button id="bStart" class="big go" type="button">START</button>
+      </div>
+      <div id="hiscores"></div>
+      <p class="keys">keys: <kbd>1</kbd>–<kbd>8</kbd> pick a good · <kbd>B</kbd> buy · <kbd>S</kbd> sell · <kbd>T</kbd> travel · <kbd>Esc</kbd> back</p>
+    </div>
+  </div>
+
+  <!-- generic modal: travel / quantity / services / encounter / game over -->
+  <div class="overlay hidden" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="card" id="mCard">
+      <div class="mtitle" id="mTitle"></div>
+      <div id="mBody"></div>
+      <p id="mMsg" role="alert"></p>
+      <div id="mBtns" class="row btns"></div>
+    </div>
+  </div>
+
+  <!-- settings -->
+  <div class="overlay hidden" id="settings" role="dialog" aria-label="Settings">
+    <div class="card narrow">
+      <div class="mtitle">SETTINGS</div>
+      <div class="row"><label for="vol">SOUND</label><input type="range" min="0" max="100" value="70" id="vol"><span id="volV">70</span></div>
+      <button class="sv" id="bCalm" type="button">CALM MODE OFF</button>
+      <button class="sv" id="bAbandon" type="button">ABANDON RUN</button>
+      <button class="sv warn" id="bReset" type="button">RESET ALL PROGRESS</button>
+      <button class="sv" id="setClose" type="button">CLOSE</button>
+    </div>
+  </div>
+
+  <div id="sr" class="vh" role="status" aria-live="polite"></div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+<script src="js/art.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
