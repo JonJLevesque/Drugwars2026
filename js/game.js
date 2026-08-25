@@ -42,9 +42,11 @@ G.used=s=>s.inv.reduce((a,b)=>a+b,0);
 G.space=s=>s.trunk-G.used(s);
 G.stashValue=s=>s.inv.reduce((a,n,i)=>a+n*(s.prices[i]||G._midPrice(i)),0);
 G.netWorth=s=>s.cash+s.bank-s.debt;
-G.maxLoan=s=>Math.max(1000, Math.floor(RULES.maxLoanMult*Math.max(0,G.netWorth(s)+s.debt)));
+// ceiling on total debt, keyed to net worth: borrowing moves cash and debt
+// together so net worth — and therefore the ceiling — never rises by borrowing.
+G.maxLoan=s=>Math.max(RULES.loanFloor, Math.floor(RULES.maxLoanMult*Math.max(0,G.netWorth(s))));
 G.bribeCost=s=>Math.round(RULES.bribePerAgent*s.encounter.agents*(1+s.day/s.days));
-G.canService=s=>s.loc===HOME;
+G.canService=s=>s.loc===HOME && s.phase==='market';
 G._midPrice=i=>(GOODS[i].lo+GOODS[i].hi)/2;
 G.rank=nw=>RANKS.find(r=>nw>=r[0])[1];
 G.avgPaid=(s,i)=> s.inv[i]? s.paid[i]/s.inv[i] : 0;

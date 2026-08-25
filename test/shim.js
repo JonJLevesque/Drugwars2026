@@ -1,4 +1,4 @@
-/* Headless loader for Gray Market: stubs the DOM/audio/storage, concatenates
+/* Headless loader for Drugwars 2026: stubs the DOM/audio/storage, concatenates
    the game modules in index.html's script order (or just the engine), and
    evaluates them with vm.runInThisContext.
    Usage:  const {G, RNG} = require('./shim').load({engineOnly:true});

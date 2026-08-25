@@ -49,7 +49,8 @@ const RULES={
   startCash:2000, startDebt:5500, startTrunk:100, startHealth:100,
   loanRate:0.10,          // per day, compounding
   bankRate:0.01,          // per day
-  maxLoanMult:2.5,        // may borrow up to this × current net worth (+1000 floor)
+  maxLoanMult:2.5,        // total debt may reach this × net worth
+  loanFloor:8000,         // ...but PayLater always carries you to this much
   availMin:5, availMax:7, // goods on offer per day (of 8)
   eventRate:0.36,         // chance per travel of a non-price event
   priceEventRate:0.18,    // chance per travel of a spike or crash

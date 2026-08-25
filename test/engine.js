@@ -1,4 +1,4 @@
-/* Gray Market engine suite. `node test/engine.js` — exits non-zero on failure.
+/* Drugwars 2026 engine suite. `node test/engine.js` — exits non-zero on failure.
    Covers determinism, save/resume ≡ straight-through, price invariants,
    buy/sell/service refusals, trunk/loan/bank arithmetic, the encounter
    state machine, endings, ranks, fmt. Ends with a Monte Carlo balance

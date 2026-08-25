@@ -93,8 +93,13 @@ over: everything market/encounter refuses ('Not now.')
 
 ## js/audio.js / js/ui.js
 UI owns index.html DOM + css. Reads `G.state` and calls the action API above;
-never mutates state directly, never touches RNG. Audio is no-op safe headless
-(test/shim.js stubs AudioContext).
+never mutates state directly, never touches RNG. Debug hook: `window.DwDbg`.
+localStorage keys: `drugwars26.*`. Audio is no-op safe headless (test/shim.js
+stubs AudioContext).
+
+## Tests must not hardcode content
+GOODS keys/names/bands, district cheap/dear, RANKS titles and EVENTS copy are
+tuning data and change freely — suites read them from the globals.
 
 ## Known engine findings (test/engine.js prints, does not assert)
 - `maxLoan = maxLoanMult × (cash+bank)`: borrowing raises cash, so the ceiling
