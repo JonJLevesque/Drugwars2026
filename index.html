@@ -20,6 +20,8 @@
     <span class="st"><small>TRUNK</small><b id="sTrunk">—</b></span>
     <span class="st"><small>HEALTH</small><b id="sHealth">—</b></span>
     <span class="st"><small>LAWYERS</small><b id="sLaw">—</b></span>
+    <span class="st heatst"><small>HEAT <b id="sHeatN">—</b></small><canvas id="gHeat" width="120" height="8" aria-label="Heat"></canvas></span>
+    <span class="st"><small>TIER</small><b id="sTier" class="amb">—</b></span>
     <button id="bSettings" class="ico" type="button" title="Settings" aria-label="Settings">&#9881;</button>
   </header>
 
@@ -47,18 +49,29 @@
         <canvas id="map" width="300" height="210" aria-label="City map. Click a district to drive there." role="img"></canvas>
         <div id="mapHint">click a district to drive</div>
       </div>
-      <button id="bTravel" class="big" type="button" title="Drive to another district — the day turns over (T)">TRAVEL <kbd>T</kbd></button>
+      <div class="btnrow">
+        <button id="bTravel" class="big" type="button" title="Drive to another district — the day turns over (T)">TRAVEL <kbd>T</kbd></button>
+        <button id="bLayLow" class="big low" type="button" title="Burn a day here, drop heat (L)">LAY LOW <kbd>L</kbd></button>
+      </div>
       <div class="gauges">
         <div class="gl"><small>TRUNK</small><canvas id="gTrunk" width="120" height="8"></canvas></div>
         <div class="gl"><small>HEALTH</small><canvas id="gHealth" width="120" height="8"></canvas></div>
       </div>
+      <!-- the contact who works this district: portrait, rep, their board -->
+      <div id="contact">
+        <div id="cHead"><span id="cPortrait"></span><div><b id="cName">—</b><small id="cRole"></small><canvas id="gRep" width="120" height="6"></canvas></div></div>
+        <div id="cLine" class="dim"></div>
+        <div id="cPerk" class="dim"></div>
+        <div id="board"></div>
+      </div>
+      <div id="jobs"><div class="sv-title">YOUR JOBS <span id="jobCount"></span></div><div id="jobList"></div></div>
       <div id="services" class="hidden">
         <div class="sv-title">DOWNTOWN</div>
         <button class="sv" id="bBank" type="button">BANK <small>1%/day</small></button>
-        <button class="sv" id="bLoan" type="button">PAYLATER <small>10%/day</small></button>
+        <button class="sv" id="bLoan" type="button">PAYLATER <small id="svRate"></small></button>
         <button class="sv" id="bClinic" type="button">CLINIC</button>
       </div>
-      <div id="awayNote" class="hidden">bank · loan · clinic<br>are Downtown</div>
+      <div id="special" class="hidden"></div>
       <div id="logbox"><div class="sv-title">LEDGER</div><div id="log"></div></div>
     </aside>
   </main>
@@ -68,21 +81,21 @@
     <div class="card">
       <div class="logo">DRUG<i>WARS</i></div>
       <p class="sub">2026 · the ti-83 classic, thirty years on</p>
-      <p class="blurb">You owe PayLater <b>$5,500</b> at <b>10% a day</b>. You have <b>$2,000</b>, a trunk, and a city
-        where everything is for sale. Thirty days to flip it into something worth keeping.
-        Buy low. Sell high. Don't get caught.</p>
+      <p class="blurb" id="menuBlurb"></p>
       <div class="row">
         <label for="seed">SEED</label>
         <input id="seed" type="text" maxlength="24" spellcheck="false" autocomplete="off">
         <button id="bReroll" class="sm" type="button" title="New random seed">&#8635;</button>
+        <button id="bDaily" class="sm" type="button" title="Today's shared market — same seed for everyone">DAILY</button>
       </div>
       <div class="row" id="lenRow" role="radiogroup" aria-label="Run length"></div>
+      <div id="tierRow" role="radiogroup" aria-label="Difficulty"></div>
       <div class="row btns">
         <button id="bResume" class="big hidden" type="button">RESUME</button>
         <button id="bStart" class="big go" type="button">START</button>
       </div>
       <div id="hiscores"></div>
-      <p class="keys">keys: <kbd>1</kbd>–<kbd>8</kbd> pick a good · <kbd>B</kbd> buy · <kbd>S</kbd> sell · <kbd>T</kbd> travel · <kbd>Esc</kbd> back</p>
+      <p class="keys">keys: <kbd>1</kbd>–<kbd>8</kbd> pick a good · <kbd>B</kbd> buy · <kbd>S</kbd> sell · <kbd>T</kbd> travel · <kbd>L</kbd> lay low · <kbd>Esc</kbd> back</p>
     </div>
   </div>
 

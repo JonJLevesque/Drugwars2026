@@ -176,5 +176,112 @@ const ART=(()=>{
   }
   function bar(cv,frac,col){ const w=cv.width,hh=cv.height; const x=cv.getContext('2d'); x.fillStyle='#0b0d10'; x.fillRect(0,0,w,hh); x.fillStyle=col; x.fillRect(0,0,w*clamp(frac,0,1),hh); x.strokeStyle='#232a33'; x.strokeRect(0.5,0.5,w-1,hh-1); }
 
-  return { icon, map, mapHit, spark, chart, scene, gauge, bar, GCOL, MAP_W:W, MAP_H:H };
+
+  /* ---- generic char-grid → canvas (n×n cells, palette merged over PAL) ---- */
+  const PPAL=Object.assign({}, PAL, { s:'#e8b48a', S:'#c98d63', n:'#8a5a3c', h:'#e6e8ec', H:'#3a2a20', u:'#b0b7c2',
+              v:'#9b5de5', r:'#e0245e', e:'#d8f542', N:'#1f2a44', q:'#4a5260', x:'#111418', z:'#3d4656', a:'#ffb454', i:'#0b0d10' });
+  function gridCanvas(rows,size,n){
+    const cv=document.createElement('canvas'); cv.width=cv.height=size;
+    const x=cv.getContext('2d'); const s=size/n;
+    rows.forEach((r,j)=>{ for(let i=0;i<n;i++){ const ch=r[i]; if(ch&&ch!=='.'){ x.fillStyle=PPAL[ch]||'#fff'; x.fillRect(Math.floor(i*s),Math.floor(j*s),Math.ceil(s),Math.ceil(s)); } } });
+    return cv;
+  }
+
+  /* ---- contact portraits: 16×16 ---- */
+  const PORTRAITS={
+    vic:[ '................','.....NNNNNN.....','....NNNNNNNN....','...NNNNNNNNNNNN.','.....ssssss.....','.....ssssss.....','.....sHssHs.....','.....ssssss.....',
+          '.....suuuus.....','......ssss......','...eeNNNNNNee...','..eeeNNNNNNeee..','..eWWNNNNNNWWe..','..eeeNNNNNNeee..','..eeeNNNNNNeee..','................'],
+    dee:[ '................','.....vvvvvv.....','....vvvvvvvv....','...vxggxxggxv...','...vvssssssvv...','...vvssssssvv...','...vvsHssHsvv...','...vvssssssvv...',
+          '...vvssssssvv...','...vvvssssvvv...','...wwwxxxxwww...','..wwwwxxxxwwww..','..wwwwwxxwwwww..','..wwwwwxxwwwww..','..wwwwwxxwwwww..','................'],
+    kev:[ '................','.....iiiiii.....','....izzzzzzi....','...izzzzzzzzi...','..bbzznnnnzzbb..','..bbznnnnnnzbb..','..bbznHnnHnzbb..','..bbznnnnnnzbb..',
+          '...zznnnnnnzz...','...zzznnnnzzz...','....zzzwwzzz....','...zzzzwwzzzz...','..zzzzzwwzzzzz..','..zzzzzzzzzzzz..','..zzzzzzzzzzzz..','................'],
+    tanya:['................','.....HHHHHH.....','....HHHHHHHH....','...HHHHHHHHHH...','...HHSSSSSSHH...','...HHSSSSSSHH...','...HHSHSSHSHH...','...HHSSSSSSHH...',
+          '..yHHSSrrSSHHy..','..y.HHSSSSHH.y..','..yy.HSSSSH.yy..','....PPPwwPPP....','...PPPPwwPPPP...','...PPPPPPPPPP...','...PPPPPPPPPP...','................'],
+    hale:['................','.....hhhhhh.....','....hhhhhhhh....','....hhsssshh....','....hssssssh....','.....ssssss.....','....xxxxxxxx....','....xxxssxxx....',
+          '.....ssssss.....','.....ssssss.....','......ssss......','...qqqxxxxqqq...','..qqqqxxxxqqqq..','..qqqqqxxqqqqq..','..qqqqqqqqqqqq..','................'],
+    lorna:['................','.....HHHHHH.....','....HHHHHHHH....','...HHHHHHHHHH...','...HHssssssHH...','...HHssssssHH...','...HHsHssHsHH...','...HHssssssHH...',
+          '...HHssrrssHH...','...HHHssssHHH...','......ssss......','...NNNNwwNNNN...','..NNNNNwwNNNNN..','..NNNNNNwNNNNN..','..NNNNNNNNNNNN..','................'],
+    paylater:['................','......zzzz......','.....zzzzzz.....','....zzzzzzzz....','....zziiiizz....','....zziiiizz....','....zziiiazz....','....zziiiizz....',
+          '.....zziizz.....','....zzzzzzzzaa..','...zzzzzzzzaya..','..zzzzzzzzzaya..','..zzzzzzzzzaya..','..zzzzzzzzzaya..','..zzzzzzzzzaa...','................'],
+    feds:['................','.....HHHHHH.....','....HHHHHHHH....','....HssssssH....','.....ssssss.....','....xxxxxxxx....','....xxxssxxx....','.....ssssss.....',
+          '.....ssssss.w...','......ssss..w...','...NNNNwwNNNN...','..NNNNNwwNNNNN..','..NNNNNxxNNNNN..','..NNNNNxxNNNNN..','..NNNNNNNNNNNN..','................'],
+  };
+  const portraitCache={};
+  function portrait(k,size){
+    const key=k+'@'+size; if(portraitCache[key]) return portraitCache[key];
+    const cv=gridCanvas(PORTRAITS[k]||PORTRAITS.paylater,size,16); portraitCache[key]=cv; return cv;
+  }
+
+  /* ---- job-type glyphs: 12×12 ---- */
+  const JOBS={
+    rush:  ['.......yy...','......yy....','.....yy.....','....yyyyyy..','.....yyyy...','......yy....','.....yy.....','....yy......','...yy.......','..yy........','............','............'],
+    import:['............','............','.oooooooooo.','.oOoOoOoOoo.','.oOoOoOoOoo.','.oOoOoOoOoo.','.oOoOoOoOoo.','.oooooooooo.','..bbbbbbbb..','...bbbbbb...','............','............'],
+    cook:  ['....wwww....','.....ww.....','.....ww.....','.....ww.....','....gggg....','...gggggg...','..gggggggg..','..ggllllgg..','.ggllllllgg.','.gglllLllgg.','.gggggggggg.','............'],
+    case:  ['.....ww.....','.wwwwwwwwww.','.w...ww...w.','.w...ww...w.','.w...ww...w.','yyy..ww..yyy','.y...ww...y.','.....ww.....','.....ww.....','....wwww....','..wwwwwwww..','............'],
+    story: ['.....yy.....','.....yy.....','....yyyy....','....yyyy....','yyyyyyyyyyyy','.yyyyyyyyyy.','..yyyyyyyy..','...yyyyyy...','...yyyyyy...','..yyy..yyy..','.yy......yy.','............'],
+  };
+  const jobCache={};
+  function job(cv,kind){
+    // (cv, kind) draws into cv; (kind, size) returns a cached canvas
+    if(typeof cv==='string'){ const key=cv+'@'+kind; if(jobCache[key]) return jobCache[key]; const c=gridCanvas(JOBS[cv]||JOBS.story,kind,12); jobCache[key]=c; return c; }
+    const size=Math.min(cv.width,cv.height); const key=kind+'@'+size; const src=jobCache[key]||(jobCache[key]=gridCanvas(JOBS[kind]||JOBS.story,size,12));
+    const x=cv.getContext('2d'); x.clearRect(0,0,cv.width,cv.height); x.drawImage(src,(cv.width-size)/2,(cv.height-size)/2); return cv;
+  }
+
+  /* ---- heat meter: 0..100, cool→hot gradient, ticks, glow when hot ---- */
+  function heat(cv,heat,t){
+    const w=cv.width,hh=cv.height; const x=cv.getContext('2d'); const f=clamp((heat||0)/100,0,1);
+    x.clearRect(0,0,w,hh); x.fillStyle='#0b0d10'; x.fillRect(0,0,w,hh);
+    const g=x.createLinearGradient(0,0,w,0); g.addColorStop(0,C.glow); g.addColorStop(0.5,C.amber); g.addColorStop(1,C.red);
+    if(f>0){
+      if(heat>=70){ const pulse= t==null? 0.7 : 0.55+0.45*Math.sin(t/180); x.save(); x.shadowColor=C.red; x.shadowBlur=8+12*pulse; x.fillStyle=g; x.fillRect(1,1,(w-2)*f,hh-2); x.restore();
+        x.fillStyle='rgba(255,107,107,'+(0.10+0.18*pulse)+')'; x.fillRect(0,0,w,hh); }
+      x.fillStyle=g; x.fillRect(1,1,(w-2)*f,hh-2);
+    }
+    [25,50,75].forEach(p=>{ const tx=Math.round(1+(w-2)*p/100)+0.5; x.strokeStyle= f*100>=p?'rgba(11,13,16,.7)':'rgba(139,149,163,.5)'; x.lineWidth=1; x.beginPath(); x.moveTo(tx,1); x.lineTo(tx,hh-1); x.stroke(); });
+    x.strokeStyle= heat>=70?'rgba(255,107,107,.6)':'#232a33'; x.strokeRect(0.5,0.5,w-1,hh-1);
+  }
+
+  /* ---- the Collectors scene: night lot under a bridge, sodium light ---- */
+  const BIGFIG=['..dddd..','..dddd..','.dddddd.','dddddddd','dddddddd','dddddddd','d.dddd.d','d.dddd.d','..dddd..','..dddd..','.dd..dd.','.dd..dd.','.dd..dd.'];
+  function collectors(cv,n,t,opt){
+    opt=opt||{}; t=t||0; const w=cv.width,hh=cv.height; const x=cv.getContext('2d');
+    x.fillStyle='#07090c'; x.fillRect(0,0,w,hh);
+    // bridge underside + pillars
+    x.fillStyle='#0f1318'; x.fillRect(0,0,w,hh*0.22);
+    x.fillStyle='#121821'; [0.08,0.92].forEach(f=>x.fillRect(w*f-10,0,20,hh*0.62));
+    x.fillStyle='#0b0f14'; x.fillRect(0,hh*0.22,w,3);
+    // lot
+    x.fillStyle='#141920'; x.fillRect(0,hh*0.6,w,hh*0.4);
+    x.fillStyle='#1c2229'; for(let i=0;i<6;i++) x.fillRect(w*0.3+i*40,hh*0.62,3,hh*0.38); // bay lines
+    // sodium streetlight cone from top center
+    const flick= opt.calm? 1 : 0.9+0.1*Math.sin(t/90)*Math.sin(t/37);
+    const lg=x.createLinearGradient(0,0,0,hh); lg.addColorStop(0,'rgba(255,190,80,'+(0.30*flick)+')'); lg.addColorStop(1,'rgba(255,190,80,0.02)');
+    x.fillStyle=lg; x.beginPath(); x.moveTo(w/2-6,0); x.lineTo(w/2+6,0); x.lineTo(w*0.9,hh); x.lineTo(w*0.1,hh); x.closePath(); x.fill();
+    x.fillStyle='rgba(255,210,120,'+(0.8*flick)+')'; x.fillRect(w/2-5,0,10,3);
+    // pool of light on the ground
+    const pg=x.createRadialGradient(w/2,hh*0.85,4,w/2,hh*0.85,w*0.32); pg.addColorStop(0,'rgba(255,190,80,'+(0.18*flick)+')'); pg.addColorStop(1,'rgba(255,190,80,0)');
+    x.fillStyle=pg; x.fillRect(0,hh*0.5,w,hh*0.5);
+    // your van (left, bigger than the scene() car)
+    x.fillStyle='#1c2229'; x.fillRect(12,hh-48,78,30); x.fillRect(22,hh-62,50,16);
+    x.fillStyle='#2a323d'; x.fillRect(26,hh-59,18,10); x.fillRect(48,hh-59,20,10); // windows
+    x.fillStyle=C.amber; x.fillRect(84,hh-42,6,6); x.fillStyle='#0b0d10'; x.fillRect(20,hh-22,14,10); x.fillRect(66,hh-22,14,10);
+    // collectors
+    const k=Math.max(0,Math.min(6,n|0)); const sz=5;
+    for(let i=0;i<k;i++){ const cx=w*0.62+(i-(k-1)/2)*52, cy=hh*0.30;
+      // shadow on ground
+      x.fillStyle='rgba(0,0,0,.45)'; x.beginPath(); x.ellipse(cx+4,cy+sz*13+2,22,5,0,0,Math.PI*2); x.fill();
+      BIGFIG.forEach((r,j)=>{ for(let c=0;c<8;c++) if(r[c]==='d'){ x.fillStyle='#050608'; x.fillRect(cx+c*sz-16,cy+j*sz,sz,sz); } });
+      // rim light from the sodium lamp
+      x.fillStyle='rgba(255,190,80,'+(0.22*flick)+')'; x.fillRect(cx-6,cy,sz*4,2); x.fillRect(cx-16,cy+sz*3,2,sz*3);
+      if(i===0){ // bat, resting on the shoulder
+        x.save(); x.translate(cx+sz*6-16,cy+sz*5); x.rotate(-0.75); x.fillStyle='#8a6a40'; x.fillRect(-3,-44,7,46); x.fillStyle='#5a4426'; x.fillRect(-3,-2,7,8); x.restore(); }
+      if(i===k-1){ // glowing phone in hand
+        const px=cx-22, py=cy+sz*7; const gg=x.createRadialGradient(px+3,py+5,1,px+3,py+5,22); gg.addColorStop(0,'rgba(255,180,84,.45)'); gg.addColorStop(1,'rgba(255,180,84,0)');
+        x.fillStyle=gg; x.fillRect(px-22,py-20,50,50); x.fillStyle='#111418'; x.fillRect(px-1,py-1,8,12); x.fillStyle=C.amber; x.fillRect(px,py,6,10); }
+    }
+    if(opt.hit){ x.fillStyle='rgba(255,90,90,'+Math.max(0,0.5-opt.hit/600)+')'; x.fillRect(0,0,w,hh); }
+  }
+
+  return { icon, map, mapHit, spark, chart, scene, gauge, bar, portrait, heat, collectors, job, GCOL, MAP_W:W, MAP_H:H };
 })();

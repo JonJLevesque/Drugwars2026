@@ -164,3 +164,47 @@ body.calm .shake{animation:none}
 
 #chartwrap{margin-top:10px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg)}
 #chart{display:block;width:100%;height:auto}
+
+/* ---- wave 2: heat, tiers, contacts, jobs ---- */
+.heatst canvas{display:block;width:120px;height:8px;margin-top:3px;border-radius:2px}
+.heatst small b{color:var(--txt);margin-left:4px}
+.btnrow{display:flex;gap:6px}
+.btnrow .big{padding:12px 6px;font-size:13px;letter-spacing:1px}
+.big.low:hover{border-color:var(--amb);color:var(--amb)}
+#tierRow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.tier{padding:8px 6px;text-align:center;display:flex;flex-direction:column;gap:3px}
+.tier b{letter-spacing:2px;font-size:12px}
+.tier small{color:var(--dim);font-size:10px;line-height:1.2}
+.tier.on{border-color:var(--amb);background:#2a2114}
+.tier.on b{color:var(--amb)}
+#contact{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg)}
+#cHead{display:flex;gap:10px;align-items:center;margin-bottom:4px}
+#cHead>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+#cPortrait canvas{display:block;image-rendering:pixelated;border-radius:4px}
+#cName{letter-spacing:1px}
+#cRole{color:var(--dim);font-size:11px}
+#gRep{width:120px;height:6px;border-radius:2px}
+#cLine{font-size:11px;font-style:italic;margin-bottom:2px}
+#cPerk{font-size:10px;letter-spacing:.5px}
+#cPerk.on{color:var(--grn)}
+#board{margin-top:6px}
+.job{border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin-top:6px;font-size:11.5px;line-height:1.4;background:var(--panel2)}
+.job .jt{display:flex;align-items:center;gap:6px;font-weight:700;letter-spacing:1px;font-size:11px;margin-bottom:2px}
+.job .jt canvas{image-rendering:pixelated}
+.job .jt .due{margin-left:auto;font-weight:400;color:var(--dim)}
+.job .jt .due.soon{color:var(--amb)} .job .jt .due.late{color:var(--red)}
+.job .jb{display:flex;gap:6px;margin-top:5px}
+.job .jb button{padding:4px 10px;font-size:11px}
+.job.story{border-color:var(--amb)}
+#jobList:empty::after{content:'none yet — every contact has work';color:var(--dim);font-size:11px}
+#special{display:flex;flex-direction:column}
+.boardTitle{font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:6px}
+.rep{font-size:10px;color:var(--dim)}
+#menuBlurb b{color:var(--amb)}
+.ldr{font-size:11px;color:var(--dim);margin-top:12px}
+.ldr .tabs{display:flex;gap:4px;margin-bottom:6px}
+.ldr .tabs button{padding:3px 8px;font-size:10px;letter-spacing:1px}
+.ldr .tabs button.on{border-color:var(--amb);color:var(--amb)}
+.ldr div.r{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #1a2028}
+.ldr b{color:var(--grn);font-weight:500}
+@media (max-width:760px){ #tierRow{grid-template-columns:repeat(2,1fr)} }
